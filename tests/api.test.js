@@ -32,7 +32,7 @@ describe('API Anything Ipsum', () => {
       .post('/api/generate')
       .send({ prompt: '' });
     
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(400);
   });
 
   test('POST /api/generate avec length «long» doit générer plus de contenu', async () => {
