@@ -4,7 +4,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Installer outils pour compiler dépendances natives (Angular/Nx SSR)
-RUN apk add --no-cache python3 make g++ bash git
+RUN apk add --no-cache python3 make g++ bash git libc6-compat
 
 # Copy package files
 COPY package*.json ./
