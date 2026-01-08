@@ -44,5 +44,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:{{ github.sha }}
+            ghcr.io/aledtahlesfous/tp_ci-cd:latest
+            ghcr.io/aledtahlesfous/tp_ci-cd:${{ github.sha }}
