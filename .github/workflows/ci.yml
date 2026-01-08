@@ -1,27 +1,48 @@
-name: CI Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [master]  # Le projet utilise 'master' comme branche principale
+    branches: [master]
   pull_request:
     branches: [master]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm test
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test  # Ce job attend que 'test' soit terminé avec succès
+    if: github.ref == 'refs/heads/master'  # Seulement sur la branche main
+    
+    permissions:
+      contents: read
+      packages: write
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          node-version: '20'
-          cache: 'npm'
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Run tests
-        run: npm test
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:{{ github.sha }}
